@@ -15,6 +15,27 @@ if (builtImages.length !== 767) failures.push(`Build contains ${builtImages.leng
 if (content.pages.length !== 767) failures.push(`Semantic index contains ${content.pages.length} pages`)
 if (content.pages.reduce((sum: number, page: { blocks: unknown[] }) => sum + page.blocks.length, 0) < 14000)
   failures.push('Semantic text block count is unexpectedly low')
+if (
+  content.pages.reduce((sum: number, page: { textLines?: unknown[] }) => sum + (page.textLines?.length ?? 0), 0) < 26000
+)
+  failures.push('Positioned text line count is unexpectedly low')
+if (
+  content.pages.some(
+    (page: {
+      width: number
+      height: number
+      textLines?: Array<{ top: number; left: number; width: number; height: number }>
+    }) =>
+      page.textLines?.some(
+        (line) =>
+          line.top < 0 ||
+          line.left < 0 ||
+          line.top + line.height > page.height + 2 ||
+          line.left + line.width > page.width + 2,
+      ),
+  )
+)
+  failures.push('One or more positioned text lines fall outside their page')
 if (sourceMedia.length !== builtMedia.length)
   failures.push(`Media mismatch: ${sourceMedia.length} source, ${builtMedia.length} built`)
 if (report.pages.some((page: { text: string }) => !page.text.trim()))

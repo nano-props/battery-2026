@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 
 const root = path.resolve(import.meta.dir, '..')
-const pdf = path.join(root, '2025-2026电池年度报告V1.02.pdf')
+const pdf = process.env.REPORT_PDF || path.join(root, '2025-2026电池年度报告V1.02.pdf')
 const mediaDir = path.join(root, 'public', 'media')
 const xmlFile = path.join(mediaDir, 'layout.xml')
 const outputFile = path.join(root, 'public', 'data', 'content.json')
@@ -177,6 +177,7 @@ for (const pageMatch of xml.matchAll(/<page\s+([^>]+)>([\s\S]*?)<\/page>/g)) {
     })
 
   const blocks = mergeLines(lines)
+  const textLines = [...lines].sort((a, b) => a.top - b.top || a.left - b.left).map(({ href: _, ...line }) => line)
   const source = pageIndex.pages[pageNumber - 1]
   pages.push({
     page: pageNumber,
@@ -185,6 +186,7 @@ for (const pageMatch of xml.matchAll(/<page\s+([^>]+)>([\s\S]*?)<\/page>/g)) {
     type: classify(blocks, images),
     width: number(pageAttrs.width),
     height: number(pageAttrs.height),
+    textLines,
     blocks: blocks.map(({ bottom: _, href: __, ...block }) => block),
     images,
     original: source.image,

@@ -1084,8 +1084,8 @@ footer small {
   cursor: text;
 }
 .desktop-text-layer > div::selection {
-  color: #fff;
-  background: #087f86;
+  color: transparent;
+  background: rgba(8, 127, 134, 0.32);
 }
 @media (max-width: 900px) {
   .virtual-page {

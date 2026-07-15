@@ -21,7 +21,7 @@ import { Input } from '#/components/ui/input.tsx'
 import { Popover, PopoverContent, PopoverTrigger } from '#/components/ui/popover.tsx'
 import { Switch } from '#/components/ui/switch.tsx'
 
-type Block = {
+type PositionedText = {
   top: number
   left: number
   width: number
@@ -30,6 +30,8 @@ type Block = {
   color: string
   text: string
   bold: boolean
+}
+type Block = PositionedText & {
   role: 'title' | 'heading' | 'body' | 'note'
   links: string[]
 }
@@ -41,6 +43,7 @@ type Page = {
   type: string
   width: number
   height: number
+  textLines?: PositionedText[]
   blocks: Block[]
   images: Media[]
   original: string
@@ -56,7 +59,7 @@ type Report = {
 const normalize = (value: string) => value.toLocaleLowerCase().replace(/\s+/g, '')
 const assetUrl = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const cleanHeading = (page: Page) => page.title.replace(new RegExp(`^${page.chapter}\\s*`), '').trim() || page.title
-const uniqueBlocks = (blocks: Block[]) => {
+const uniqueBlocks = (blocks: PositionedText[]) => {
   const seen = new Set<string>()
   return blocks.filter((block) => {
     const key = `${block.top}|${block.left}|${block.width}|${block.height}|${block.text}`
@@ -272,7 +275,7 @@ function SemanticPage({ page, onOriginal }: { page: Page; onOriginal: (page: Pag
 }
 
 function DesktopSlide({ page }: { page: Page }) {
-  const selectableBlocks = uniqueBlocks(page.blocks)
+  const selectableBlocks = uniqueBlocks(page.textLines?.length ? page.textLines : page.blocks)
   return (
     <article id={`page-${page.page}`} data-page={page.page} className="desktop-slide">
       <header>
@@ -283,13 +286,7 @@ function DesktopSlide({ page }: { page: Page }) {
         <b>{String(page.page).padStart(3, '0')}</b>
       </header>
       <div className="desktop-slide-page">
-        <img
-          src={assetUrl(page.original)}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-        />
+        <img src={assetUrl(page.original)} alt="" loading="lazy" decoding="async" draggable={false} />
         <div className="desktop-text-layer" role="document" aria-label={`第 ${page.page} 页文字`}>
           {selectableBlocks.map((block, index) => (
             <div
