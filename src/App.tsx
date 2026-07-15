@@ -56,6 +56,15 @@ type Report = {
 const normalize = (value: string) => value.toLocaleLowerCase().replace(/\s+/g, '')
 const assetUrl = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const cleanHeading = (page: Page) => page.title.replace(new RegExp(`^${page.chapter}\\s*`), '').trim() || page.title
+const uniqueBlocks = (blocks: Block[]) => {
+  const seen = new Set<string>()
+  return blocks.filter((block) => {
+    const key = `${block.top}|${block.left}|${block.width}|${block.height}|${block.text}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
 const estimatePageHeight = (page: Page, mobile: boolean) => {
   if (page.type === 'cover') return mobile ? 514 : 588
   const characters = page.blocks.reduce((sum, block) => sum + block.text.length, 0)
@@ -263,6 +272,7 @@ function SemanticPage({ page, onOriginal }: { page: Page; onOriginal: (page: Pag
 }
 
 function DesktopSlide({ page }: { page: Page }) {
+  const selectableBlocks = uniqueBlocks(page.blocks)
   return (
     <article id={`page-${page.page}`} data-page={page.page} className="desktop-slide">
       <header>
@@ -272,12 +282,34 @@ function DesktopSlide({ page }: { page: Page }) {
         </div>
         <b>{String(page.page).padStart(3, '0')}</b>
       </header>
-      <img
-        src={assetUrl(page.original)}
-        alt={`原报告第 ${page.page} 页：${page.title}`}
-        loading="lazy"
-        decoding="async"
-      />
+      <div className="desktop-slide-page">
+        <img
+          src={assetUrl(page.original)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+        />
+        <div className="desktop-text-layer" role="document" aria-label={`第 ${page.page} 页文字`}>
+          {selectableBlocks.map((block, index) => (
+            <div
+              key={index}
+              style={
+                {
+                  '--text-left': `${(block.left / page.width) * 100}%`,
+                  '--text-top': `${(block.top / page.height) * 100}%`,
+                  '--text-width': `${(block.width / page.width) * 100}%`,
+                  '--text-height': `${(block.height / page.height) * 100}%`,
+                  '--text-size': `${(block.size / page.width) * 100}cqw`,
+                } as React.CSSProperties
+              }
+            >
+              {block.text}
+              {'\n'}
+            </div>
+          ))}
+        </div>
+      </div>
     </article>
   )
 }

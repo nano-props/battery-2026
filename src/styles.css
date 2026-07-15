@@ -1051,13 +1051,41 @@ footer small {
     'Arial Narrow',
     sans-serif;
 }
-.desktop-slide > img {
+.desktop-slide-page {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 16/9;
+  background: #fff;
+}
+.desktop-slide-page > img {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 16/9;
+  height: 100%;
   object-fit: contain;
-  background: #fff;
+  pointer-events: none;
+  user-select: none;
+}
+.desktop-text-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: transparent;
+  user-select: text;
+}
+.desktop-text-layer > div {
+  position: absolute;
+  top: var(--text-top);
+  left: var(--text-left);
+  width: var(--text-width);
+  min-height: var(--text-height);
+  font-size: var(--text-size);
+  line-height: 1.15;
+  white-space: pre-wrap;
+  cursor: text;
+}
+.desktop-text-layer > div::selection {
+  color: #fff;
+  background: #087f86;
 }
 @media (max-width: 900px) {
   .virtual-page {
@@ -1188,6 +1216,10 @@ footer small {
   }
 }
 @media (max-width: 900px) {
+  .search-input input,
+  .page-jump-controls input {
+    font-size: 16px;
+  }
   .desktop-only {
     display: none;
   }
