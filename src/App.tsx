@@ -54,6 +54,7 @@ type Report = {
 }
 
 const normalize = (value: string) => value.toLocaleLowerCase().replace(/\s+/g, '')
+const assetUrl = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const cleanHeading = (page: Page) => page.title.replace(new RegExp(`^${page.chapter}\\s*`), '').trim() || page.title
 const estimatePageHeight = (page: Page, mobile: boolean) => {
   if (page.type === 'cover') return mobile ? 514 : 588
@@ -94,7 +95,7 @@ function TextBlock({ block }: { block: Block }) {
 function MediaItem({ media, page, prominent = false }: { media: Media; page: number; prominent?: boolean }) {
   return (
     <figure className={prominent ? 'media-item prominent' : 'media-item'}>
-      <img src={media.src} alt={`第 ${page} 页配图`} loading="lazy" decoding="async" />
+      <img src={assetUrl(media.src)} alt={`第 ${page} 页配图`} loading="lazy" decoding="async" />
     </figure>
   )
 }
@@ -271,7 +272,12 @@ function DesktopSlide({ page }: { page: Page }) {
         </div>
         <b>{String(page.page).padStart(3, '0')}</b>
       </header>
-      <img src={page.original} alt={`原报告第 ${page.page} 页：${page.title}`} loading="lazy" decoding="async" />
+      <img
+        src={assetUrl(page.original)}
+        alt={`原报告第 ${page.page} 页：${page.title}`}
+        loading="lazy"
+        decoding="async"
+      />
     </article>
   )
 }
@@ -316,7 +322,7 @@ export function App() {
   })
 
   useEffect(() => {
-    fetch('/data/content.json')
+    fetch(assetUrl('/data/content.json'))
       .then((response) => response.json())
       .then(setReport)
   }, [])
@@ -714,7 +720,7 @@ export function App() {
             </button>
           </header>
           <div className="original-stage">
-            <img src={originalPage.original} alt={`原报告第 ${originalPage.page} 页`} />
+            <img src={assetUrl(originalPage.original)} alt={`原报告第 ${originalPage.page} 页`} />
           </div>
           <button
             className="original-nav prev"

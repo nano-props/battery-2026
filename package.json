@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
+    "build:gh": "tsc -b && vite build --base=/battery-2026/",
     "preview": "vite preview --host 0.0.0.0",
     "extract": "bun scripts/extract-report.ts && bun scripts/extract-layout.ts && bun scripts/clean-logo-backgrounds.ts",
     "verify": "bun scripts/verify-report.ts",

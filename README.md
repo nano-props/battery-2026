@@ -1,31 +1,54 @@
-# 2025-2026 电池行业年度报告
+# 2025-2026 Battery Industry Annual Report
 
-基于原始 767 页 PDF 制作的响应式在线报告。桌面端使用原始幻灯片保证视觉一致性，移动端将文字、链接与图片重新组合为正文、数据网格、时间线、图片墙和章节封面。两端均由 TanStack Virtual 虚拟滚动，并包含页码跳转、全文搜索、可收起章节导航、阅读进度和深浅主题。
+A responsive online edition of the original 767-page report. Desktop browsers display the original slides for
+visual fidelity, while mobile browsers can optionally reflow the extracted text, links, and images into a
+screen-friendly reading layout. Both modes use TanStack Virtual and include direct page navigation, full-text
+search, collapsible chapter navigation, reading progress, and light and dark themes.
 
-## 本地开发
+## Local Development
 
 ```bash
 bun install
 bun run dev
 ```
 
-## 生产构建
+## Production Build
 
 ```bash
 bun run build
 bun run verify
 ```
 
-构建结果位于 `dist/`。验证命令会检查生产目录是否包含全部 767 页、结构化内容索引是否完整、页序是否连续，以及所有媒体对象是否进入生产目录。
+The production output is written to `dist/`. The verification command checks that all 767 ordered pages, the
+structured content index, and all extracted media assets are present in the production output.
 
-## 重新生成报告资产
+## GitHub Pages
 
-原始 PDF 不纳入源码仓库，也不会进入生产构建。需要重新生成资产时，请先将
-`2025-2026电池年度报告V1.02.pdf` 放在项目根目录，并安装 Poppler，随后执行：
+The GitHub Pages build uses `/battery-2026/` as its Vite base path:
+
+```bash
+bun run build:gh
+```
+
+To build and publish the `docs/` directory to the `gh-pages` branch, run the deployment helper from a clean
+`main` branch:
+
+```bash
+./deploy.sh
+```
+
+Configure GitHub Pages to publish from the `docs/` directory on the `gh-pages` branch. The deployment script
+force-updates that generated branch and then returns to `main`.
+
+## Regenerating Report Assets
+
+The source PDF is intentionally excluded from the repository and production output. To regenerate the extracted
+assets, place `2025-2026电池年度报告V1.02.pdf` in the project root, install Poppler, and run:
 
 ```bash
 brew install poppler
 bun run extract
 ```
 
-抽取脚本从项目根目录的 PDF 生成原稿核对页、文字坐标、超链接、独立媒体对象和结构化页面模型，并在生成结束时核验页面数量。
+The extraction pipeline generates the original page images, positioned text, hyperlinks, standalone media, and
+the structured page model. It verifies the page and asset counts when extraction completes.
